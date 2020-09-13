@@ -1,4 +1,5 @@
 #include "levenshtein.h"
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -48,7 +49,36 @@ int levenshteinMatrix(const char *s1, const char *s2)
     return answer;
 }
 
-int levenshteinRecursiveMatrixless(const char *s1, const char *s2);
+int levenshteinRecursiveMatrixless(char *s1, char *s2)
+{
+    int firstLenght = strlen(s1);
+    int secondLenght = strlen(s2);
+
+    if (!firstLenght || !secondLenght)
+    {
+        return fabs(firstLenght - secondLenght);
+    }
+    else
+    {
+        char lastSymbolFirst = s1[firstLenght - 1];
+        char lastSymbolSecond = s2[secondLenght - 1];
+
+        int correction = (lastSymbolFirst == lastSymbolSecond) ? 0 : 1;
+        s1[firstLenght - 1] = '\0';
+        int answerFirst = levenshteinRecursiveMatrixless(s1, s2) + 1;
+        s2[secondLenght - 1] = '\0';
+        int answerMiddle = levenshteinRecursiveMatrixless(s1, s2) + correction;
+        s1[firstLenght - 1] = lastSymbolFirst;
+        int answerSecond = levenshteinRecursiveMatrixless(s1, s2) + 1;
+        s2[secondLenght - 1] = lastSymbolSecond;
+
+        answerFirst = answerFirst < answerMiddle ? answerFirst : answerMiddle;
+        answerFirst = answerFirst < answerSecond ? answerFirst : answerSecond;
+        return answerFirst;
+    }
+    
+}
+
 int levenshteinRecursiveMatrix(const char *s1, const char *s2);
 
 int levenshteinMatrixExpose(const char *s1, const char *s2)
